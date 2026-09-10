@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ghostex — First Run Revamp V1</title>
+<style>
+
+  :root{
+    --bg:#04060c;
+    --bg-2:#08112a;
+    --surface:#0d111a;
+    --surface-2:#121827;
+    --surface-3:#17213a;
+    --line:rgba(122,152,255,.12);
+    --line-strong:rgba(146,174,255,.22);
+    --text:#f3f6ff;
+    --muted:#a4aec4;
+    --muted-2:#707b94;
+    --accent:#3f66ff;
+    --accent-2:#9eb7ff;
+    --good:#86d7af;
+    --warn:#e2c37f;
+    --danger:#e08992;
+    --shadow:0 20px 48px rgba(0,0,0,.36);
+    --radius:10px;
+    --radius-sm:8px;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0}
+  body{
+    overflow:hidden;
+    background:
+      linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px),
+      radial-gradient(760px 340px at 22% 18%, rgba(44,84,255,.38), transparent 68%),
+      radial-gradient(820px 360px at 76% 6%, rgba(58,95,255,.34), transparent 66%),
+      radial-gradient(540px 240px at 62% 50%, rgba(32,62,210,.22), transparent 75%),
+      linear-gradient(180deg,#03050a 0%, #04060c 35%, #05070d 100%);
+    background-size:32px 32px,32px 32px,auto,auto,auto,auto;
+    color:var(--text);
+    font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input{font:inherit} button{color:inherit}
+  .app{height:100%;width:100%;display:grid;grid-template-rows:58px 1fr 58px;position:relative}
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;padding:0 22px;position:relative;z-index:20;
+    background:rgba(6,9,16,.9);border-bottom:1px solid rgba(122,152,255,.1);backdrop-filter:blur(10px)
+  }
+  .brand{display:flex;align-items:center;gap:9px;font-weight:630;letter-spacing:-.01em}
+  .brand-mark{
+    width:22px;height:22px;border-radius:6px;display:grid;place-items:center;
+    background:linear-gradient(180deg,#7b95ff 0%,#4b70ff 55%,#3556dd 100%);
+    color:#eef3ff;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15),0 6px 18px rgba(48,77,205,.28);
+    font-weight:800;font-size:12px
+  }
+  .prototype{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}
+  .prototype span{padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.018)}
+  .viewport{position:relative;overflow:hidden;min-height:0}
+  .slides{height:100%;transition:transform .44s cubic-bezier(.2,.78,.28,1);will-change:transform}
+  .slide{height:100%;min-height:100%;display:flex;justify-content:center;align-items:center;padding:16px 38px 18px}
+  .screen{width:min(1120px,100%);max-height:100%;display:grid;align-content:center;gap:16px}
+  .screen.narrow{width:min(940px,100%)}
+  .eyebrow{
+    color:var(--accent-2);text-transform:uppercase;letter-spacing:.15em;font-size:10px;font-weight:760;margin-bottom:8px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace
+  }
+  h1,h2,h3,p{margin:0}
+  h1{max-width:860px;font-size:clamp(36px,4.4vw,58px);line-height:1.01;letter-spacing:-.045em;font-weight:700}
+  h2{font-size:clamp(26px,2.8vw,38px);line-height:1.06;letter-spacing:-.03em;font-weight:680}
+  h3{font-size:14px;letter-spacing:-.01em}
+  .lead{color:#b2bdd3;max-width:740px;font-size:14px;line-height:1.55;letter-spacing:-.005em}
+  .lead strong{color:var(--text);font-weight:610}
+  .actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:0}
+  .btn{
+    height:34px;padding:0 12px;border-radius:8px;border:1px solid var(--line-strong);background:#0f1624;
+    display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-weight:620;font-size:12px;transition:.12s ease
+  }
+  .btn:hover{background:#162033}
+  .btn.primary{
+    color:#eef3ff;border-color:rgba(120,150,255,.44);
+    background:linear-gradient(180deg,#6283ff 0%,#4168ff 52%,#2f4fd8 100%);
+    box-shadow:0 8px 20px rgba(63,102,255,.26)
+  }
+  .btn.primary:hover{background:linear-gradient(180deg,#7391ff 0%,#5074ff 52%,#3960e2 100%)}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+  .btn.ghost:hover{color:var(--text);background:rgba(255,255,255,.03)}
+  .mini{font-size:11px;color:var(--muted-2);line-height:1.44}.mini strong{color:var(--muted);font-weight:600}
+
+  .hero-visual{display:grid;grid-template-columns:1fr auto 1.02fr;align-items:start;gap:14px;margin-top:0}
+  .agent-stack,.gx-stack,.why-card,.card,.list,.project-panel,.cap-card,.install-card{
+    border:1px solid var(--line);
+    background:linear-gradient(180deg,rgba(15,19,29,.97),rgba(11,15,23,.97));
+    border-radius:var(--radius);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.025)
+  }
+  .agent-stack,.gx-stack{padding:12px}
+  .stack-label{color:var(--muted-2);font-size:10px;font-weight:760;letter-spacing:.12em;text-transform:uppercase;margin:1px 1px 8px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .agent-row,.feature-chip{
+    display:flex;align-items:center;gap:10px;min-height:44px;padding:8px 9px;border-radius:8px;
+    background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.045)
+  }
+  .agent-row+.agent-row,.feature-chip+.feature-chip{margin-top:6px}
+  .logo{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--surface-3);border:1px solid rgba(255,255,255,.06);font-size:11px;font-weight:800;color:#dfe5f3}
+  .logo svg{width:16px;height:16px;display:block}
+  .logo.claude{color:#dfa07e}.logo.codex{color:#fff}.logo.cursor{color:#f0efef}.logo.pi{color:#cbff72}.logo.other{color:#c7d0da;font-size:15px;letter-spacing:1px}
+  .logo.agent-cluster{display:flex;align-items:center;justify-content:center;gap:2px;padding:4px;background:var(--surface-3)}
+  .logo.agent-cluster .mini-agent-logo{width:8px;height:14px;display:grid;place-items:center;overflow:hidden}.logo.agent-cluster .mini-agent-logo svg{width:100%;height:100%;display:block}.logo.agent-cluster .mini-agent-logo.pi-mini{color:#c8ff62}
+  .row-main{min-width:0;flex:1}.row-title{font-size:12px;font-weight:650}.row-sub{font-size:10px;color:var(--muted);margin-top:3px}
+  .bridge{color:#7891ff;font-size:16px;align-self:center}
+  .gx-stack{background:linear-gradient(180deg,rgba(18,25,40,.98),rgba(11,15,23,.98))}
+  .gx-head{display:flex;align-items:center;gap:9px;margin-bottom:9px}.gx-icon{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;color:#eff3ff;font-weight:850;background:linear-gradient(180deg,#6f89ff,#496eff)}
+
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:0}.why-card,.card{padding:13px}
+  .why-card .num{font-size:9px;color:var(--muted-2);font-weight:800;letter-spacing:.13em;margin-bottom:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .why-card h3{margin-bottom:6px}.why-card p{color:var(--muted);font-size:11px;line-height:1.45}
+
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+  .section-head .copy{max-width:720px}.section-head .side-note{max-width:250px;text-align:right}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .list{overflow:hidden}
+  .list-row{min-height:58px;display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line)}
+  .list-row:last-child{border-bottom:0}
+  .list-row.selected{background:linear-gradient(90deg,rgba(63,102,255,.2),rgba(63,102,255,.06))}
+  .status{padding:4px 7px;border-radius:999px;font-size:9px;font-weight:760;color:#d4e0ff;background:rgba(75,112,255,.16);border:1px solid rgba(97,131,255,.18)}
+  .status.muted{color:var(--muted);background:rgba(255,255,255,.025);border-color:var(--line)}
+  .radio{width:16px;height:16px;border-radius:50%;border:1px solid var(--line-strong);display:grid;place-items:center}
+  .radio.active{border-color:#8ea9ff;background:rgba(63,102,255,.16)}
+  .radio.active:after{content:"";width:6px;height:6px;border-radius:50%;background:#b2c3ff}
+  .toggle{width:36px;height:20px;border-radius:999px;background:#212b3d;border:1px solid rgba(255,255,255,.06);padding:2px;cursor:pointer;transition:.18s ease;flex:0 0 auto}
+  .toggle i{display:block;width:14px;height:14px;border-radius:50%;background:#8a94a5;transition:.18s ease;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+  .toggle.on{background:linear-gradient(90deg,#3556dd,#4d72ff);border-color:#6482ff}.toggle.on i{transform:translateX(16px);background:#f4f7ff}
+  .tag{color:#dbe4ff;font-size:9px;font-weight:720;border:1px solid rgba(99,128,255,.22);background:rgba(99,128,255,.1);padding:4px 7px;border-radius:999px}
+  .recommended-tag{display:inline-flex;align-items:center;gap:7px;padding:6px 9px 6px 7px;border-color:rgba(99,128,255,.22);background:rgba(99,128,255,.1);color:#ebf0ff;box-shadow:none;white-space:nowrap}
+  .recommended-tag .recommended-mark{width:18px;height:18px;border-radius:5px;display:grid;place-items:center;background:rgba(99,128,255,.18);border:1px solid rgba(99,128,255,.2);color:#dfe7ff;font-size:10px;font-weight:850}
+  .recommended-tag strong{color:#f7f9ff;font-weight:750}
+
+  .cap-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .cap-card{min-height:136px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+  .cap-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+  .cap-icon{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;background:var(--surface-2);color:#dde6f6;font-size:14px}
+  .cap-card p{font-size:11px;color:var(--muted);line-height:1.45;margin-top:6px;max-width:390px}
+  .privacy{display:flex;align-items:center;gap:7px;color:var(--muted-2);font-size:10px}
+
+  .install-box{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .install-card{padding:14px}
+  .install-card .head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .check{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:rgba(79,114,255,.14);border:1px solid rgba(99,128,255,.2);color:#d8e1ff;font-size:11px}
+  .install-lines{background:#0a0f18;border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10px;color:#b7c1d2;line-height:1.58}
+
+  .mobile-layout{display:grid;grid-template-columns:1fr 380px;gap:28px;align-items:center}
+  .phone{
+    width:272px;height:516px;margin:auto;border-radius:38px;border:1px solid rgba(146,174,255,.16);
+    background:linear-gradient(180deg,#172034,#0c1119);padding:12px;box-shadow:0 22px 44px rgba(0,0,0,.34);transform:none
+  }
+  .phone-inner{height:100%;border-radius:28px;overflow:hidden;border:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,#0f1523,#111827);position:relative}
+  .notch{width:84px;height:22px;background:#04060a;border-radius:0 0 12px 12px;margin:auto}
+  .phone-head{padding:17px 14px 10px;font-size:13px;font-weight:700}
+  .phone-session{margin:7px 10px;padding:10px;border-radius:10px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+  .phone-session-head{display:flex;align-items:center;gap:8px}
+  .phone-agent-logo{width:19px;height:19px;border-radius:6px;display:grid;place-items:center;flex:0 0 auto;background:#232d42;border:1px solid rgba(255,255,255,.07)}
+  .phone-agent-logo svg{width:12px;height:12px;display:block}.phone-agent-logo.claude{color:#d97757}.phone-agent-logo.codex{color:#fff}
+  .phone-session-copy{min-width:0;flex:1}.phone-session .small{font-size:10px;color:var(--muted);margin-top:2px}
+  .phone-composer{position:absolute;left:10px;right:10px;bottom:12px;height:42px;border-radius:11px;border:1px solid var(--line);background:#141c2a;display:flex;align-items:center;padding:0 11px;color:#798295;font-size:10px}
+  .mobile-points{display:grid;gap:8px;margin:18px 0}.point{display:flex;gap:10px;align-items:flex-start;color:var(--muted);font-size:11px;line-height:1.42}.point b{color:var(--text);font-weight:630}
+  .dot{width:18px;height:18px;border-radius:5px;background:rgba(63,102,255,.12);border:1px solid rgba(63,102,255,.18);display:grid;place-items:center;color:#cbd8ff;font-size:10px;flex:0 0 auto}
+
+  .project-panel{padding:15px;display:grid;gap:12px}
+  .field-label{font-size:10px;color:var(--muted);font-weight:650;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em}
+  .field{min-height:40px;border:1px solid var(--line);border-radius:8px;background:#0c121d;display:flex;align-items:center;justify-content:space-between;padding:0 11px;gap:10px}
+  .field .value{font-size:11px;color:#c7cfdb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .choice-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .choice{min-height:56px;border:1px solid var(--line);border-radius:8px;padding:9px;cursor:pointer;background:rgba(255,255,255,.015)}
+  .choice.active{border-color:rgba(99,128,255,.48);background:rgba(99,128,255,.09)}
+  .choice .title{font-size:11px;font-weight:650}.choice .sub{font-size:9px;color:var(--muted);margin-top:4px}
+
+  .footer{display:flex;align-items:center;justify-content:center;position:relative;z-index:20;padding:0 24px;background:rgba(6,9,16,.92);border-top:1px solid rgba(122,152,255,.1)}
+  .nav-wrap{display:flex;align-items:center;gap:10px}
+  .arrow{width:32px;height:32px;border-radius:8px;border:1px solid var(--line);background:#0f1624;display:grid;place-items:center;cursor:pointer;color:#b9c2d3;transition:.12s ease}
+  .arrow:hover{background:#161f31;color:white}.arrow:disabled{opacity:.24;cursor:default}.arrow:disabled:hover{background:#0f1624;color:#b9c2d3}
+  .steps{display:flex;gap:5px;align-items:center}.step-dot{width:5px;height:5px;border-radius:999px;background:#364255;transition:.2s ease}.step-dot.active{width:16px;border-radius:999px;background:#89a1ff}
+  .shortcut{position:absolute;right:24px;color:var(--muted-2);font-size:10px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .top-arrow{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:30}
+  .toast{position:fixed;left:50%;bottom:70px;transform:translate(-50%,20px);opacity:0;pointer-events:none;padding:9px 12px;border-radius:8px;border:1px solid var(--line-strong);background:#121929;color:#e4ebfb;font-size:10px;box-shadow:var(--shadow);transition:.18s ease;z-index:100}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid var(--line);border-bottom-color:rgba(255,255,255,.14);padding:2px 4px;border-radius:4px;background:rgba(255,255,255,.03)}
+  .hide{display:none!important}.clickable{cursor:pointer}.clickable:hover{background:rgba(255,255,255,.035)}
+
+  @media (max-width:850px){
+    .slide{padding-left:20px;padding-right:20px}
+    .hero-visual{grid-template-columns:1fr}.bridge{transform:rotate(90deg);text-align:center}
+    .why-grid,.grid-2,.cap-grid,.install-box{grid-template-columns:1fr 1fr}
+    .mobile-layout{grid-template-columns:1fr}.phone{display:none}
+    .section-head{align-items:flex-start;flex-direction:column}.section-head .side-note{text-align:left}
+  }
+  @media (max-width:620px){
+    .why-grid,.grid-2,.cap-grid,.install-box,.choice-grid{grid-template-columns:1fr}
+    .topbar{padding:0 16px}.slide{padding:12px 16px 16px}.shortcut{display:none}
+    h1{font-size:34px}.screen{gap:14px}.cap-card{min-height:122px}
+  }
+
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">G</div>
+      <span>Ghostex</span>
+    </div>
+    <div class="prototype">
+      <span>First-run concept · V1</span>
+      <span id="counter">1 / 8</span>
+    </div>
+  </header>
+
+  <main class="viewport" id="viewport">
+    <button class="arrow top-arrow" id="up" aria-label="Previous screen" title="Previous screen">↑</button>
+
+    <div class="slides" id="slides">
+
+      <!-- 1 — WELCOME -->
+      <section class="slide">
+        <div class="screen">
+          <div>
+            <div class="eyebrow">Welcome to Ghostex</div>
+            <h1>Your coding agents.<br>One serious workspace.</h1>
+          </div>
+          <p class="lead">
+            Keep <strong>Codex, Claude Code, and other CLI agents</strong> running side by side —
+            with persistent sessions, a real browser, an editor, and remote access when you leave your desk.
+          </p>
+          <div class="hero-visual">
+            <div class="agent-stack">
+              <div class="stack-label">Your agents</div>
+              <div class="agent-row"><div class="logo claude" aria-label="Claude Code logo"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg></div><div class="row-main"><div class="row-title">Claude Code</div><div class="row-sub">Refactor · running 8m</div></div><span class="status">LIVE</span></div>
+              <div class="agent-row"><div class="logo codex" aria-label="Codex logo"><svg viewBox="0 0 256 260" aria-hidden="true"><path fill="currentColor" d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z"/></svg></div><div class="row-main"><div class="row-title">Codex</div><div class="row-sub">Tests · waiting</div></div><span class="status">READY</span></div>
+              <div class="agent-row"><div class="logo cursor" aria-label="Cursor Agent logo"><svg viewBox="0 0 466.73 532.09" aria-hidden="true"><path fill="currentColor" d="M457.43,125.94L244.42,2.96c-6.84-3.95-15.28-3.95-22.12,0L9.3,125.94c-5.75,3.32-9.3,9.46-9.3,16.11v247.99c0,6.65,3.55,12.79,9.3,16.11l213.01,122.98c6.84,3.95,15.28,3.95,22.12,0l213.01-122.98c5.75-3.32,9.3-9.46,9.3-16.11v-247.99c0-6.65-3.55-12.79-9.3-16.11h-.01ZM444.05,151.99l-205.63,356.16c-1.39,2.4-5.06,1.42-5.06-1.36v-233.21c0-4.66-2.49-8.97-6.53-11.31L24.87,145.67c-2.4-1.39-1.42-5.06,1.36-5.06h411.26c5.84,0,9.49,6.33,6.57,11.39h-.01Z"/></svg></div><div class="row-main"><div class="row-title">Cursor Agent</div><div class="row-sub">Agent session · ready</div></div><span class="status">READY</span></div>
+              <div class="agent-row"><div class="logo other" aria-label="Other agents">•••</div><div class="row-main"><div class="row-title">Other agents</div><div class="row-sub">Choose from 20+ supported CLI agents</div></div><span class="status muted">20+</span></div>
+            </div>
+            <div class="bridge">→</div>
+            <div class="gx-stack">
+              <div class="gx-head"><div class="gx-icon">G</div><div><div class="row-title">Ghostex workspace</div><div class="row-sub">Everything around the agents</div></div></div>
+              <div class="feature-chip"><span>⌁</span><div class="row-main"><div class="row-title">Persistent sessions</div><div class="row-sub">Powered by ZMX · leave, restart, reconnect</div></div></div>
+              <div class="feature-chip"><span>◫</span><div class="row-main"><div class="row-title">Browser + VS Code</div><div class="row-sub">Review the actual work</div></div></div>
+              <div class="feature-chip"><span>▣</span><div class="row-main"><div class="row-title">Desktop + mobile</div><div class="row-sub">Stay attached anywhere</div></div></div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary next">Set up your Ghostex workspace <span>→</span></button>
+            <button class="btn ghost" data-toast="Advanced setup can stay available from Settings after onboarding.">I already know Ghostex</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2 — WHY GHOSTEX -->
+      <section class="slide">
+        <div class="screen">
+          <div class="section-head">
+            <div class="copy">
+              <div class="eyebrow">Why Ghostex?</div>
+              <h2>Codex and Claude are the agents.<br>Ghostex is the workspace around them.</h2>
+            </div>
+            <p class="mini side-note">You keep your existing agent subscriptions and CLIs. Ghostex doesn't replace them.</p>
+          </div>
+          <div class="why-grid">
+            <div class="why-card">
+              <div class="num">01 · MULTI-AGENT</div>
+              <h3>Run several agents at once</h3>
+              <p>Claude on the refactor, Codex on tests, another terminal on the server — organized by project instead of scattered windows.</p>
+            </div>
+            <div class="why-card">
+              <div class="num">02 · REVIEW</div>
+              <h3>See what the agent is building</h3>
+              <p>Open the embedded Chromium browser, inspect DevTools, review code, Markdown, diffs, and generated docs without leaving the workspace.</p>
+            </div>
+            <div class="why-card">
+              <div class="num">03 · PERSISTENCE</div>
+              <h3>Your sessions survive the UI</h3>
+              <p>Agent sessions stay attachable. Restart Ghostex, switch machines, search old prompts, and resume where you stopped.</p>
+            </div>
+            <div class="why-card">
+              <div class="num">04 · ORCHESTRATION</div>
+              <h3>Let agents work together</h3>
+              <p>Claude can launch Codex sub-agents. Work can move through a project board instead of living inside one chat thread.</p>
+            </div>
+            <div class="why-card">
+              <div class="num">05 · MOBILE</div>
+              <h3>Walk away without losing control</h3>
+              <p>Check running sessions, reply, or resume from your phone while the actual workload stays on your computer or remote host.</p>
+            </div>
+            <div class="why-card">
+              <div class="num">06 · CHOICE</div>
+              <h3>Use the interface that fits</h3>
+              <p>Terminal when you need raw power. Chat view when you want readability. Browser and IDE when it's time to inspect the result.</p>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary next">Set up my agents <span>→</span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3 — AGENTS -->
+      <section class="slide">
+        <div class="screen narrow">
+          <div class="section-head">
+            <div class="copy">
+              <div class="eyebrow">Agents</div>
+              <h2>Use the agents you already have.</h2>
+              <p class="lead" style="font-size:14px;margin-top:10px">Ghostex can detect installed CLIs. Pick the one you want as your default — you can run the others anytime.</p>
+            </div>
+            <button class="btn" data-toast="Prototype: rescanned installed agent CLIs.">↻ Rescan</button>
+          </div>
+          <div class="list">
+            <div class="list-row selected clickable agent-choice" data-agent="claude">
+              <div class="radio active"></div><div class="logo claude" aria-label="Claude Code logo"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg></div>
+              <div class="row-main"><div class="row-title">Claude Code</div><div class="row-sub">Installed · uses your Claude account</div></div>
+              <span class="status">Detected</span>
+            </div>
+            <div class="list-row clickable agent-choice" data-agent="codex">
+              <div class="radio"></div><div class="logo codex" aria-label="Codex logo"><svg viewBox="0 0 256 260" aria-hidden="true"><path fill="currentColor" d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z"/></svg></div>
+              <div class="row-main"><div class="row-title">Codex CLI</div><div class="row-sub">Installed · uses your ChatGPT account</div></div>
+              <span class="status">Detected</span>
+            </div>
+            <div class="list-row clickable agent-choice" data-agent="cursor">
+              <div class="radio"></div><div class="logo cursor" aria-label="Cursor Agent logo"><svg viewBox="0 0 466.73 532.09" aria-hidden="true"><path fill="currentColor" d="M457.43,125.94L244.42,2.96c-6.84-3.95-15.28-3.95-22.12,0L9.3,125.94c-5.75,3.32-9.3,9.46-9.3,16.11v247.99c0,6.65,3.55,12.79,9.3,16.11l213.01,122.98c6.84,3.95,15.28,3.95,22.12,0l213.01-122.98c5.75-3.32,9.3-9.46,9.3-16.11v-247.99c0-6.65-3.55-12.79-9.3-16.11h-.01ZM444.05,151.99l-205.63,356.16c-1.39,2.4-5.06,1.42-5.06-1.36v-233.21c0-4.66-2.49-8.97-6.53-11.31L24.87,145.67c-2.4-1.39-1.42-5.06,1.36-5.06h411.26c5.84,0,9.49,6.33,6.57,11.39h-.01Z"/></svg></div>
+              <div class="row-main"><div class="row-title">Cursor Agent</div><div class="row-sub">Installed · uses your Cursor account</div></div>
+              <span class="status">Detected</span>
+            </div>
+            <div class="list-row">
+              <div class="logo agent-cluster" aria-label="Other supported agent logos"><span class="mini-agent-logo pi-mini"><svg viewBox="0 0 800 800" aria-hidden="true"><g transform="matrix(1.353161,0,0,1.353161,-141.266105,-141.266105)"><path fill="currentColor" d="M165.29,165.29L517.36,165.29L517.36,400L400,400L400,517.36L282.65,517.36L282.65,634.72L165.29,634.72L165.29,165.29ZM282.65,282.65L282.65,400L400,400L400,282.65L282.65,282.65Z"/></g><g transform="matrix(1.353161,0,0,1.353161,-141.266105,-141.266105)"><rect fill="currentColor" x="517.36" y="400" width="117.36" height="234.72"/></g></svg></span><span class="mini-agent-logo"><svg viewBox="0 0 24 30" aria-hidden="true"><rect x="6" y="12" width="12" height="12" style="fill:rgb(91,142,235);fill-opacity:.5"/><path d="M18,6L6,6L6,24L18,24L18,6ZM24,30L0,30L0,0L24,0L24,30Z" style="fill:rgb(91,142,235)"/></svg></span><span class="mini-agent-logo"><svg viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="gemini-gradient-panel3" x1="14" y1="46" x2="50" y2="18" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4C8DF6"/><stop offset=".52" stop-color="#8F9BFF"/><stop offset="1" stop-color="#C68CFF"/></linearGradient></defs><path d="M32 4c.55 0 1.04.38 1.18.92 1.46 5.67 4.18 10.67 8.16 14.99 4 4.3 8.78 7.18 14.34 8.61.54.15.92.63.92 1.18 0 .55-.38 1.04-.92 1.18-5.56 1.43-10.34 4.3-14.34 8.61-3.98 4.32-6.7 9.32-8.16 14.99A1.219 1.219 0 0 1 32 56a1.22 1.22 0 0 1-1.18-.92c-1.46-5.67-4.18-10.67-8.16-14.99-4-4.31-8.78-7.18-14.34-8.61A1.22 1.22 0 0 1 7.4 30.3c0-.55.38-1.03.92-1.18 5.56-1.43 10.34-4.3 14.34-8.61 3.98-4.32 6.7-9.32 8.16-14.99A1.22 1.22 0 0 1 32 4Z" fill="url(#gemini-gradient-panel3)"/></svg></span></div>
+              <div class="row-main"><div class="row-title">Other agents</div><div class="row-sub">Pi Agent, OpenCode, Gemini, and more</div></div>
+              <button class="btn" style="height:31px" data-toast="Prototype: this would open the supported agents and install guides.">Install guide</button>
+            </div>
+          </div>
+          <p class="mini">Ghostex supports many CLI agents. Start with one detected agent now; add or configure others anytime from Settings.</p>
+          <div class="actions"><button class="btn primary next">Continue with <span id="agentButtonName">Claude Code</span> <span>→</span></button></div>
+        </div>
+      </section>
+
+      <!-- 4 — EXTENSIONS -->
+      <section class="slide">
+        <div class="screen narrow">
+          <div class="section-head">
+            <div class="copy">
+              <div class="eyebrow">Workspace</div>
+              <h2>Choose what lives next to your agents.</h2>
+              <p class="lead" style="font-size:14px;margin-top:10px">These are workspace views, not permissions. Start lean; anything you hide remains available in Settings.</p>
+            </div>
+            <span class="tag recommended-tag"><span class="recommended-mark">✓</span><span><strong>Recommended</strong> · Browser + Docs</span></span>
+          </div>
+          <div class="list">
+            <div class="list-row"><div class="cap-icon">◎</div><div class="row-main"><div class="row-title">Browser</div><div class="row-sub">Preview and inspect the app your agent is building.</div></div><div class="toggle on" data-toggle="browser"><i></i></div></div>
+            <div class="list-row"><div class="cap-icon">≡</div><div class="row-main"><div class="row-title">Docs</div><div class="row-sub">Markdown, HTML mockups, diagrams, annotations.</div></div><div class="toggle on" data-toggle="docs"><i></i></div></div>
+            <div class="list-row"><div class="cap-icon">&lt;/&gt;</div><div class="row-main"><div class="row-title">Code</div><div class="row-sub">VS Code-style editor for source, diffs, and PR review.</div></div><div class="toggle" data-toggle="code"><i></i></div></div>
+            <div class="list-row"><div class="cap-icon">▦</div><div class="row-main"><div class="row-title">Kanban</div><div class="row-sub">Hand project tasks directly to agents and orchestrators.</div></div><div class="toggle" data-toggle="kanban"><i></i></div></div>
+            <div class="list-row"><div class="cap-icon">⚡</div><div class="row-main"><div class="row-title">Automate</div><div class="row-sub">Schedule one-time or recurring agent work.</div></div><div class="toggle" data-toggle="automate"><i></i></div></div>
+          </div>
+          <div class="actions"><button class="btn primary next">Continue <span>→</span></button></div>
+        </div>
+      </section>
+
+      <!-- 5 — CAPABILITIES -->
+      <section class="slide">
+        <div class="screen">
+          <div class="section-head">
+            <div class="copy">
+              <div class="eyebrow">Capabilities</div>
+              <h2>Choose what your agents can do through Ghostex.</h2>
+              <p class="lead" style="font-size:14px;margin-top:10px">These add power beyond a normal terminal session. You stay in control and can change every capability later.</p>
+            </div>
+            <p class="mini side-note">Safer default: <strong>Computer Use starts off.</strong></p>
+          </div>
+          <div class="cap-grid">
+            <div class="cap-card">
+              <div class="cap-top">
+                <div><div class="cap-icon">◎</div><h3 style="margin-top:12px">Browser Use</h3><p>Let agents inspect and control Ghostex browser tabs: screenshots, console, clicks, fills, keys, and page state.</p></div>
+                <div class="toggle on" data-toggle="browser-use"><i></i></div>
+              </div>
+              <div class="privacy">◌ Limited to the Ghostex embedded browser</div>
+            </div>
+            <div class="cap-card">
+              <div class="cap-top">
+                <div><div class="cap-icon">⌖</div><h3 style="margin-top:12px">Computer Use</h3><p>Allow supported agents to interact with your desktop when a task needs apps outside Ghostex.</p></div>
+                <div class="toggle" data-toggle="computer-use"><i></i></div>
+              </div>
+              <div class="privacy">◌ Requires OS accessibility / screen permissions</div>
+            </div>
+            <div class="cap-card">
+              <div class="cap-top">
+                <div><div class="cap-icon">⇄</div><h3 style="margin-top:12px">Control Ghostex</h3><p>Let agents create sessions, send prompts, launch other agents, and orchestrate work through the Ghostex CLI.</p></div>
+                <div class="toggle on" data-toggle="ghostex-control"><i></i></div>
+              </div>
+              <div class="privacy">◌ Enables cross-agent workflows</div>
+            </div>
+            <div class="cap-card">
+              <div class="cap-top">
+                <div><div class="cap-icon">◉</div><h3 style="margin-top:12px">Notifications</h3><p>Get notified when an agent needs attention or completes a task — on desktop and, if connected, on mobile.</p></div>
+                <div class="toggle on" data-toggle="notifications"><i></i></div>
+              </div>
+              <div class="privacy">◌ No agent action required</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary next">Apply capabilities <span>→</span></button>
+            <button class="btn ghost next">Use minimal setup</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6 — CONNECT AGENTS -->
+      <section class="slide">
+        <div class="screen narrow">
+          <div>
+            <div class="eyebrow">Connect your agents</div>
+            <h2>Make Codex and Claude feel native in Ghostex.</h2>
+            <p class="lead" style="font-size:14px;margin-top:10px">A lightweight integration lets Ghostex understand agent status, show richer session UI, and support actions around the terminal session.</p>
+          </div>
+          <div class="install-box">
+            <div class="install-card">
+              <div class="head"><div class="logo">C</div><div class="row-main"><div class="row-title">Claude Code</div><div class="row-sub">Hooks + Ghostex skill</div></div><div class="check">✓</div></div>
+              <div class="install-lines">✓ detect running / waiting / done<br>✓ richer chat session view<br>✓ Ghostex control skill</div>
+            </div>
+            <div class="install-card">
+              <div class="head"><div class="logo">O</div><div class="row-main"><div class="row-title">Codex CLI</div><div class="row-sub">Hooks + Ghostex skill</div></div><div class="check">✓</div></div>
+              <div class="install-lines">✓ session status integration<br>✓ persistent resume flow<br>✓ Ghostex control skill</div>
+            </div>
+          </div>
+          <div class="card" style="display:flex;align-items:center;gap:12px">
+            <div class="cap-icon">i</div>
+            <div class="row-main">
+              <div class="row-title">The agent still runs as its normal CLI.</div>
+              <div class="row-sub">Ghostex adds integration around it; it doesn't proxy your prompts through a Ghostex cloud service.</div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary next" data-toast="Prototype: agent integrations installed.">Connect installed agents <span>→</span></button>
+            <button class="btn ghost next">Skip for now</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7 — MOBILE -->
+      <section class="slide">
+        <div class="screen">
+          <div class="mobile-layout">
+            <div>
+              <div class="eyebrow">Optional · Mobile Ghostex</div>
+              <h2>Take the session with you.</h2>
+              <p class="lead" style="font-size:14px;margin-top:12px;max-width:570px">
+                Keep the agents running on your computer or remote host, then check in from your phone. Reply to a waiting agent, inspect status, or continue the same live session.
+              </p>
+              <div class="mobile-points">
+                <div class="point"><div class="dot">1</div><div><b>Install Ghostex Mobile</b><br>Android now; iOS access can be offered through the current distribution path.</div></div>
+                <div class="point"><div class="dot">2</div><div><b>Pair this machine</b><br>Ghostex creates the connection details; the phone attaches to the same gxserver sessions.</div></div>
+                <div class="point"><div class="dot">3</div><div><b>Keep working remotely</b><br>The heavy work stays on the host. Your phone is the control surface.</div></div>
+              </div>
+              <div class="actions">
+                <button class="btn primary" data-toast="Prototype: this would open pairing / QR setup.">Set up mobile</button>
+                <button class="btn ghost next">Not now</button>
+              </div>
+              <p class="mini" style="margin-top:10px">You can set this up anytime from <strong>Settings → Remote & Mobile</strong>.</p>
+            </div>
+            <div class="phone" aria-label="Ghostex mobile preview">
+              <div class="phone-inner">
+                <div class="notch"></div>
+                <div class="phone-head">Ghostex · MacBook Pro</div>
+                <div class="phone-session"><div class="phone-session-head"><div class="phone-agent-logo claude"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg></div><div class="phone-session-copy"><div class="row-title">Refactor auth flow</div><div class="small">Claude Code · working · 12m</div></div></div></div>
+                <div class="phone-session"><div class="phone-session-head"><div class="phone-agent-logo codex"><svg viewBox="0 0 256 260" aria-hidden="true"><path fill="currentColor" d="M239.184 106.203a64.716 64.716 0 0 0-5.576-53.103C219.452 28.459 191 15.784 163.213 21.74A65.586 65.586 0 0 0 52.096 45.22a64.716 64.716 0 0 0-43.23 31.36c-14.31 24.602-11.061 55.634 8.033 76.74a64.665 64.665 0 0 0 5.525 53.102c14.174 24.65 42.644 37.324 70.446 31.36a64.72 64.72 0 0 0 48.754 21.744c28.481.025 53.714-18.361 62.414-45.481a64.767 64.767 0 0 0 43.229-31.36c14.137-24.558 10.875-55.423-8.083-76.483Zm-97.56 136.338a48.397 48.397 0 0 1-31.105-11.255l1.535-.87 51.67-29.825a8.595 8.595 0 0 0 4.247-7.367v-72.85l21.845 12.636c.218.111.37.32.409.563v60.367c-.056 26.818-21.783 48.545-48.601 48.601Zm-104.466-44.61a48.345 48.345 0 0 1-5.781-32.589l1.534.921 51.722 29.826a8.339 8.339 0 0 0 8.441 0l63.181-36.425v25.221a.87.87 0 0 1-.358.665l-52.335 30.184c-23.257 13.398-52.97 5.431-66.404-17.803ZM23.549 85.38a48.499 48.499 0 0 1 25.58-21.333v61.39a8.288 8.288 0 0 0 4.195 7.316l62.874 36.272-21.845 12.636a.819.819 0 0 1-.767 0L41.353 151.53c-23.211-13.454-31.171-43.144-17.804-66.405v.256Zm179.466 41.695-63.08-36.63L161.73 77.86a.819.819 0 0 1 .768 0l52.233 30.184a48.6 48.6 0 0 1-7.316 87.635v-61.391a8.544 8.544 0 0 0-4.4-7.213Zm21.742-32.69-1.535-.922-51.619-30.081a8.39 8.39 0 0 0-8.492 0L99.98 99.808V74.587a.716.716 0 0 1 .307-.665l52.233-30.133a48.652 48.652 0 0 1 72.236 50.391v.205ZM88.061 139.097l-21.845-12.585a.87.87 0 0 1-.41-.614V65.685a48.652 48.652 0 0 1 79.757-37.346l-1.535.87-51.67 29.825a8.595 8.595 0 0 0-4.246 7.367l-.051 72.697Zm11.868-25.58 28.138-16.217 28.188 16.218v32.434l-28.086 16.218-28.188-16.218-.052-32.434Z"/></svg></div><div class="phone-session-copy"><div class="row-title">Run integration tests</div><div class="small">Codex · waiting for you</div></div></div></div>
+                <div class="phone-session"><div class="phone-session-head"><div class="phone-agent-logo claude"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212 2.736-.75.096-.324-.302.04-.496.154-.162 1.267-.871z"/></svg></div><div class="phone-session-copy"><div class="row-title">Fix mobile nav</div><div class="small">Claude Code · done</div></div></div></div>
+                <div class="phone-composer">Send a follow-up…</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8 — PROJECT -->
+      <section class="slide">
+        <div class="screen narrow">
+          <div>
+            <div class="eyebrow">Get started</div>
+            <h2>Open your first project.</h2>
+            <p class="lead" style="font-size:14px;margin-top:10px">One folder, one default agent, one default view. Everything else can evolve after you're inside the app.</p>
+          </div>
+          <div class="project-panel">
+            <div>
+              <div class="field-label">Project folder</div>
+              <div class="field"><span class="value" id="folderValue">~/Projects/my-app</span><button class="btn" style="height:31px" data-toast="Prototype: native folder picker would open here.">Choose folder</button></div>
+            </div>
+            <div>
+              <div class="field-label">Start with</div>
+              <div class="choice-grid">
+                <div class="choice active project-agent" data-project-agent="claude"><div class="title">Claude Code</div><div class="sub">Default agent</div></div>
+                <div class="choice project-agent" data-project-agent="codex"><div class="title">Codex</div><div class="sub">Use for first session</div></div>
+                <div class="choice project-agent" data-project-agent="terminal"><div class="title">Terminal</div><div class="sub">No agent yet</div></div>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Default session view</div>
+              <div class="choice-grid">
+                <div class="choice active view-choice" data-view="chat"><div class="title">Chat</div><div class="sub">Cleaner agent conversation</div></div>
+                <div class="choice view-choice" data-view="terminal"><div class="title">Terminal</div><div class="sub">Raw CLI interface</div></div>
+                <div class="choice view-choice" data-view="remember"><div class="title">Remember last</div><div class="sub">Switch freely</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="btn primary" id="finish">Open Ghostex <span>→</span></button>
+            <button class="btn ghost" data-toast="Advanced agent, terminal, appearance, remote host, and integration settings stay in Settings.">Advanced settings later</button>
+          </div>
+          <p class="mini">That's it. No feature tour to memorize — the workspace can teach deeper features contextually after first launch.</p>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="nav-wrap">
+      <button class="arrow" id="prev" aria-label="Previous screen">←</button>
+      <div class="steps" id="steps"></div>
+      <button class="arrow" id="next" aria-label="Next screen">→</button>
+    </div>
+    <div class="shortcut"><span class="kbd">↑</span> <span class="kbd">↓</span> or scroll to navigate</div>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const slides = document.getElementById('slides');
+  const slideEls = [...document.querySelectorAll('.slide')];
+  const total = slideEls.length;
+  const counter = document.getElementById('counter');
+  const prev = document.getElementById('prev');
+  const next = document.getElementById('next');
+  const up = document.getElementById('up');
+  const steps = document.getElementById('steps');
+  const toast = document.getElementById('toast');
+  let index = 0;
+  let wheelLock = false;
+
+  for (let i=0;i<total;i++){
+    const d=document.createElement('div');
+    d.className='step-dot';
+    d.addEventListener('click',()=>go(i));
+    steps.appendChild(d);
+  }
+
+  function go(i){
+    index=Math.max(0,Math.min(total-1,i));
+    slides.style.transform=`translateY(-${index*100}%)`;
+    counter.textContent=`${index+1} / ${total}`;
+    prev.disabled=index===0;
+    up.disabled=index===0;
+    next.disabled=index===total-1;
+    [...steps.children].forEach((d,n)=>d.classList.toggle('active',n===index));
+  }
+  function goNext(){ if(index<total-1) go(index+1); }
+  function goPrev(){ if(index>0) go(index-1); }
+
+  prev.addEventListener('click',goPrev);
+  next.addEventListener('click',goNext);
+  up.addEventListener('click',goPrev);
+  document.querySelectorAll('.next').forEach(b=>b.addEventListener('click',goNext));
+
+  document.addEventListener('keydown',(e)=>{
+    if(['ArrowDown','PageDown','Enter'].includes(e.key) && !['INPUT','TEXTAREA'].includes(document.activeElement.tagName)){e.preventDefault();goNext();}
+    if(['ArrowUp','PageUp'].includes(e.key)){e.preventDefault();goPrev();}
+  });
+
+  document.getElementById('viewport').addEventListener('wheel',(e)=>{
+    if(wheelLock || Math.abs(e.deltaY)<20) return;
+    wheelLock=true;
+    e.deltaY>0?goNext():goPrev();
+    setTimeout(()=>wheelLock=false,650);
+  },{passive:true});
+
+  document.querySelectorAll('.toggle').forEach(t=>{
+    t.addEventListener('click',()=>t.classList.toggle('on'));
+  });
+
+  document.querySelectorAll('.agent-choice').forEach(row=>{
+    row.addEventListener('click',(e)=>{
+      if(e.target.closest('button')) return;
+      document.querySelectorAll('.agent-choice').forEach(r=>{
+        r.classList.remove('selected');
+        r.querySelector('.radio').classList.remove('active');
+      });
+      row.classList.add('selected');
+      row.querySelector('.radio').classList.add('active');
+      const names={claude:'Claude Code',codex:'Codex CLI',cursor:'Cursor Agent'};
+      document.getElementById('agentButtonName').textContent=names[row.dataset.agent]||row.dataset.agent;
+    });
+  });
+
+  const projectAgents=[...document.querySelectorAll('.project-agent')];
+  const viewChoices=[...document.querySelectorAll('.view-choice')];
+
+  projectAgents.forEach(c=>{
+    c.addEventListener('click',()=>{
+      projectAgents.forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+
+  viewChoices.forEach(c=>{
+    c.addEventListener('click',()=>{
+      viewChoices.forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+    });
+  });
+
+  let toastTimer;
+  function showToast(msg){
+    toast.textContent=msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>toast.classList.remove('show'),2400);
+  }
+  document.querySelectorAll('[data-toast]').forEach(el=>{
+    el.addEventListener('click',(e)=>showToast(el.dataset.toast));
+  });
+  document.getElementById('finish').addEventListener('click',()=>{
+    showToast('Prototype complete — this would create the project and open the first Ghostex session.');
+  });
+
+  go(0);
+</script>
+</body>
+</html>
