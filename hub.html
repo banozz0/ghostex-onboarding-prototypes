@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ghostex Onboarding Prototypes</title>
+<style>
+  :root{--ink:#0A0A0A;--surface:#121314;--line:#23282F;--text:#E8EAED;--muted:#8A929C;--accent:#5B6CFF}
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--ink);color:var(--text);font:15px/1.5 system-ui,sans-serif;padding:48px 24px}
+  main{max-width:1100px;margin:0 auto}
+  h1{font-size:28px;font-weight:600;letter-spacing:-.01em}
+  p.sub{color:var(--muted);margin-top:6px}
+  h2{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:40px}
+  h2 + p{color:var(--muted);font-size:13px;margin-top:4px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:16px}
+  a.card.feature{display:grid;grid-template-columns:3fr 2fr;margin-top:16px}
+  a.card.feature img{border-bottom:0;border-right:1px solid var(--line);height:100%}
+  a.card.feature .meta{padding:24px;display:flex;flex-direction:column;justify-content:center}
+  a.card.feature .meta b{font-size:20px}
+  a.card.feature .meta span{font-size:14px;margin-top:8px}
+  .open{margin-top:18px;color:var(--accent);font-weight:600;font-size:14px}
+  @media (max-width:760px){a.card.feature{grid-template-columns:1fr}a.card.feature img{border-right:0;border-bottom:1px solid var(--line)}}
+  a.card{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  a.card:hover,a.card:focus-visible{border-color:var(--accent);outline:none}
+  a.card img{display:block;width:100%;aspect-ratio:1672/941;object-fit:cover;border-bottom:1px solid var(--line)}
+  .meta{padding:14px 16px}
+  .meta b{font-weight:600}
+  .meta span{display:block;color:var(--muted);font-size:13px;margin-top:2px}
+  code{font:12px ui-monospace,monospace;color:var(--muted)}
+  .how{margin-top:28px;color:var(--muted);font-size:13px;line-height:1.7}
+</style>
+</head>
+<body>
+<main>
+  <h1>Ghostex onboarding prototypes</h1>
+  <p class="sub">The current prototype is B4 · Extensions. The iterations below are the steps it came through, and the v1 round is the three directions those grew out of.</p>
+
+  <h2>Current prototype</h2>
+  <a class="card feature" href="b4-extensions.html">
+    <img src="thumbs/b4.jpg" alt="B4 Extensions, panel 2 with the Ghostex integration preview on the right">
+    <div class="meta">
+      <b>B4 · Extensions</b>
+      <span>Every extension keeps its switch on its own row and is previewed live on the right of its own panel, so nothing turns on unseen and only the Install guide and the after-onboarding steps open a popup.</span>
+      <span>Updated 11 September 2026.</span>
+      <div class="open">Open the prototype →</div>
+    </div>
+  </a>
+
+  <h2>Iterations</h2>
+  <p>The steps B4 came through, each trying one idea.</p>
+  <div class="grid">
+    <a class="card" href="b3-preview.html">
+      <img src="thumbs/b3.jpg" alt="B3 Preview, panel 3 with the Browser preview open">
+      <div class="meta"><b>B3 · Preview</b><span>B2 with the DarkVeil background and the shipped app icon. Every extension tile opens a popup that previews it live and holds its switch.</span></div>
+    </a>
+    <a class="card" href="b2-focused.html">
+      <img src="thumbs/b2.jpg" alt="B2 Focused, panel 1">
+      <div class="meta"><b>B2 · Focused</b><span>Five panels, one sentence per row. Panel 1 shows each idea as a short live demo, and the agents, workspace and mobile panels react to what you pick.</span></div>
+    </a>
+  </div>
+
+  <h2>v1</h2>
+  <p>The first round: A and B rebuilt in React from their mockups, and C, the clean-blue HTML concept.</p>
+  <div class="grid">
+    <a class="card" href="a-clean-shader.html">
+      <img src="thumbs/a.jpg" alt="Version A, panel 1 mockup">
+      <div class="meta"><b>A · Clean shader</b><span>Ported 1:1 from panels.html. Static light behind the right column, real app windows.</span></div>
+    </a>
+    <a class="card" href="b-tone-down.html">
+      <img src="thumbs/b.jpg" alt="Version B, panel 1 mockup">
+      <div class="meta"><b>B · Tone down</b><span>Rebuilt from the PNGs. Animated nebula, node diagrams, device mockups. B2 grew out of this one.</span></div>
+    </a>
+    <a class="card" href="c-clean-blue.html">
+      <img src="thumbs/c.jpg" alt="Version C, first screen">
+      <div class="meta"><b>C · Clean blue</b><span>The original first-run concept in plain HTML. Vertical slides, blue grid glow, fits any window.</span></div>
+    </a>
+  </div>
+  <p class="how">
+    Click anything that looks clickable.<br>
+    B4, B3, B2, A and B: ← / → step through the panels, and <code>?step=5</code> on a link opens a panel directly. Each is a 1672×941 app window scaled to fit, so a desktop browser works best.<br>
+    C: ↑ / ↓ or scroll to move between screens.
+  </p>
+</main>
+</body>
+</html>
