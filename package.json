@@ -1,0 +1,17 @@
+{
+  "name": "ghostex-onboarding-prototypes",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "dev": "bun scripts/serve.ts",
+    "deploy": "scripts/deploy.sh"
+  },
+  "dependencies": {
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
