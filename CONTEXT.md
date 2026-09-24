@@ -1,6 +1,6 @@
 # Ghostex onboarding prototypes
 
-The first-run onboarding a new Ghostex user walks through before the app opens, prototyped as interactive click-throughs (A, B, B2, C) to compare directions.
+The first-run onboarding a new Ghostex user walks through before the app opens, prototyped as interactive click-throughs: C (concept), B (first build) and B4 (final).
 
 ## Language
 

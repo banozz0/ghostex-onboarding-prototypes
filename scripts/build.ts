@@ -11,10 +11,7 @@ const src = resolve(import.meta.dir, "../src");
 const dist = resolve(import.meta.dir, "../dist");
 const CURRENT = "b4-extensions";
 const VERSIONS: Record<string, string> = {
-  "a-clean-shader": "Ghostex Clean Shader Onboarding",
   "b-tone-down": "Ghostex Tone-Down Onboarding",
-  "b2-focused": "Ghostex Focused Onboarding",
-  "b3-preview": "Ghostex Preview Onboarding",
   "b4-extensions": "Ghostex Extensions Onboarding",
 };
 const MIME: Record<string, string> = { ttf: "font/ttf", png: "image/png", svg: "image/svg+xml", jpg: "image/jpeg" };

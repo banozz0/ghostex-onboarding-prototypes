@@ -8,7 +8,7 @@ import { resolve } from "node:path";
 const src = resolve(import.meta.dir, "../src");
 const dist = resolve(import.meta.dir, "../dist");
 const port = Number(process.env.PORT ?? 5178);
-const VERSIONS = ["a-clean-shader", "b-tone-down", "b2-focused", "b3-preview", "b4-extensions"];
+const VERSIONS = ["b-tone-down", "b4-extensions"];
 const RELOAD = `<script>new EventSource("/__reload").onmessage=()=>location.reload()</script>`;
 const clients = new Set<ReadableStreamDefaultController>();
 

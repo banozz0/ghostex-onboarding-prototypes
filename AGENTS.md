@@ -5,7 +5,7 @@
 Interactive prototypes of the Ghostex first-run onboarding. Glossary: `CONTEXT.md` (say *onboarding*, *panel*, *view*; never "landing page", that is the marketing site).
 
 ## Layout
-- `src/<version>/` — one React app per version (A, B, B2, B3, B4); `mockups/` beside a version are the design sources it was built from. `src/c-clean-blue.html` is hand-written, copied as is.
+- `src/<version>/` — one React app per version (B, B4; A, B2 and B3 were cut 2026-09-25 and live in git history); `mockups/` beside a version are the design sources it was built from. `src/c-clean-blue.html` is hand-written, copied as is.
 - `src/hub.html` — the page listing every version; `src/thumbs/` its images.
 - `scripts/build.ts` — bundles each version into one self-contained `dist/<version>.html` and lays out the site: `dist/index.html` is B4 (`CURRENT`), `dist/hub.html` the hub.
 - `.github/*.jpg` — README screenshots (`node scripts/shot.mjs b4-extensions <panel> out.png`).

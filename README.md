@@ -20,20 +20,17 @@ Five panels, from welcome to the first project:
 
 ## How it got here
 
-Six versions: three first directions, then three rounds on the one that won. Every one of them is still clickable on the [hub](https://banozz0.github.io/ghostex-onboarding-prototypes/hub.html).
+Three versions, from idea to the one that shipped. All three are still clickable on the [hub](https://banozz0.github.io/ghostex-onboarding-prototypes/hub.html).
 
 | Version | The idea |
 | :-- | :-- |
-| **B4 · Extensions** | Extension switches back on the tiles, with a live preview beside each panel. **Current.** |
-| B3 · Preview | Every extension tile opens a popup that previews it. Dropped after review. |
-| B2 · Focused | Cut to five panels and one sentence per row; the panels react to what you pick. |
-| A · Clean shader | Ported 1:1 from the first mockups: static light, real app windows. |
-| B · Tone down | Rebuilt from the mockup PNGs: animated nebula, node diagrams, devices. |
-| C · Clean blue | The original concept in plain HTML: vertical slides, blue grid glow. |
+| **B4 · Final** | Five panels, one sentence per row, a live preview beside each panel. **What Ghostex ships.** |
+| B · First build | Eight panels rebuilt in React from the mockups: animated nebula, node diagrams, everything at once. B4 is this, cut down. |
+| C · Concept | The original idea in plain HTML: vertical slides, blue grid glow. |
 
 ## Built with
 
-React 19 and Bun. Each version is bundled into one self-contained HTML file: fonts and images are inlined, so it opens with a double-click and needs no server. The animated backgrounds are hand-written WebGL shaders. Every React version has a Playwright check that clicks through it and asserts what should happen: 149 checks in all.
+React 19 and Bun. Each version is bundled into one self-contained HTML file: fonts and images are inlined, so it opens with a double-click and needs no server. The animated backgrounds are hand-written WebGL shaders. Both React versions have a Playwright check that clicks through them and asserts what should happen: 58 checks in all.
 
 ```sh
 bun install
